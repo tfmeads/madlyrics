@@ -1,0 +1,3 @@
+The purpose of this directory (MadLyrics/src/scripts) is for scripts that should only have to be run once.
+I'm only keeping them here in case the Moby dictionaries are corrupted or something and I need to modify
+them again.
