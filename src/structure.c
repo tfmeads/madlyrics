@@ -3,6 +3,8 @@
 #include "structure.h"
 #include "line.h"
 
+//Object that holds structure data for a given song
+
 structure *newStructure(){
 
 	structure *s = (structure *) malloc(sizeof(structure));

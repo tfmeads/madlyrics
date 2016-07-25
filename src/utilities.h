@@ -14,5 +14,9 @@ int secondTokenStrcmp(char *a,char *b);
 int isInFile(char *targ, char *filename);
 char *removeUnderscores(char *str);
 int isAlnum(char *str);
+int isInCharArr(char **arr,char *str,int size);
+char *getWordFromDictEntry(char *str);
+char *getRhymeIdFromDictEntry(char *str);
+char *toUpper(char *s);
 
 #endif

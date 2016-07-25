@@ -5,6 +5,8 @@
 #include <string.h>
 #include "utilities.h"
 
+//helpful functions that don't fit anywhere else
+
 char *makeParseable(char *s){
 
 	char *result = malloc(sizeof(char)*256);
@@ -200,6 +202,72 @@ int isAlnum(char *str){ //returns true if string is alphanumeric, false otherwis
 		i++;
 	}
 	return 1;
+}
+
+int isInCharArr(char **arr,char *str,int size){ // returns 1 if str is found in arr, 0 otherwise
+	
+	for(int i = 0; i<size; i++){
+		if(strcmp(arr[i],str) == 0){
+			return 1;
+		}
+	}
+	
+	return 0;
+}
+
+char *getWordFromDictEntry(char *str){ //get word data from entry from madlyrics/dict/editedRhymeDict.csv
+
+	char *result = malloc(sizeof(char)*128);
+	char cToStr[2];
+	cToStr[1] = '\0';
+
+	int i = 0;
+
+	while(str[i] != ' '){
+		cToStr[0] = str[i];
+		strcat(result,cToStr);
+		i++;
+	}
+
+	return result;
+}
+
+char *getRhymeIdFromDictEntry(char *str){ //get rhyme ID data from entry from madlyrics/dict/editedRhymeDict.csv
+
+	char *result = malloc(sizeof(char)*128);
+	char cToStr[2];
+	cToStr[1] = '\0';
+
+	int i = 0;
+	int past = 0; //if 0, current char is not past word data. if 1, it is
+
+	while(str[i] != 0){
+		
+		if(str[i] == ' '){
+			if(!past){
+				i++; //skips second space in entry, but not other spaces
+			}
+			past = 1;
+		}
+
+		if(past && str[i] != '\n'){
+			cToStr[0] = str[i];
+			strcat(result,cToStr);
+		}
+
+		i++;
+	}
+	return result;
+}
+
+char *toUpper(char *str){
+
+	char *result = malloc(sizeof(char)*256);
+
+	for(int i = 0; str[i]; i++){
+		  result[i] = toupper(str[i]);
+	}
+	return result;
 }
 
 

@@ -5,57 +5,23 @@
 #include "utilities.h"
 #include "lyrics_io.h"
 
-int main(int argc,char **argv){
-	
-	//generate song structure file
+int main(int argc,char **argv){ //Takes a .txt file of a song, feeds it into Parsey McParseFace, takes POS-tagged
+				//text and creates a file outlining the song's structure and updates the POS lists
+				//found in madlyrics/lists directory
 
 	structure *s = newStructure();
+
 	int numLines = getNumLines(argv[1]);
 
 	readLinesToStructure(s,argv[1],numLines);
 
 	parseLines(s,argv[1],numLines);
+	
+	findRhymeScheme(s,argv[1]);
 
 	writeStructToFile(s,argv[1],numLines);
 	
-	char * path = malloc(sizeof(char)*128);
-	char **wordsArr = malloc(sizeof(char *)*64);
-	char *word = malloc(sizeof(char *)*256);
-
-	FILE *dest;
-	int k = 0;
-	int newEntries = 0;
-
-	while(s->lines[k] != NULL){
-		wordsArr = strToArr(removeUnderscores(s->lines[k]->pos)); //evenly sized array with format (word) (pos)
-		int l = 0;
-		while(wordsArr[l] != NULL){
-			strcpy(word,wordsArr[l]);
-			if(isAlnum(word)){	
-			strcpy(path,"lists/"); 
-			strcat(path,cleanStr(wordsArr[l+1]));
-			strcat(path,".txt");
-			if(!isInFile(word,path)){
-				dest = fopen(path,"a");
-				fprintf(dest,"%s\n",word);
-				fclose(dest);
-				newEntries++;
-			}
-			}
-			l+=2;
-		}
-		k++;
-	}
-
-	if(newEntries > 0){	
-	fprintf(stderr,"Updated POS Lists with %i new terms.\n",newEntries);	
-	}
-	else{
-	fprintf(stderr,"No new terms were added to POS Lists.\n");
-	}
-
-
-
+	updatePosLists(s);
 
 	return 0; 
 }

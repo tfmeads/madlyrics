@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include "line.h"
 
-line *newLine(char *s){
+line *newLine(char *s){ //holds info for every line in a song. Always exists within a structure object.
 
 	line *l = (line *) malloc(sizeof(line));
 	l->words = (char *) malloc(sizeof(char)*512); 
 	l->words = s;
-	l->wordCount = 0;
 	l->pos = (char *) malloc(sizeof(char)*512);
 	
 	return l;
