@@ -1,9 +1,3 @@
-harp
-own
-pebble
-empty
-full
-simple
 mojo
 new
 ramble
@@ -11,12 +5,17 @@ easy
 cool
 crazy
 royal
+harp
+own
+pebble
+empty
+full
+simple
 phony
 sorry
 only
 little
 obscene
-much
 main
 same
 typical
@@ -28,6 +27,3 @@ other
 long
 strange
 sweet
-slow
-sick
-tired

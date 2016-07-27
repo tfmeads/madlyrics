@@ -3,9 +3,10 @@
 
 void readLinesToStructure(structure *s, char *filename, int numLines);
 void parseLines(structure *s, char *filename, int numLines);
-void writeStructToFile(structure *s, char *filename, int numLines);
+void writeStructToFile(structure *s, char *filename, int numLines,char ***words,char ***rhymes);
 void updatePosLists(structure *s);
-void findRhymeScheme(structure *s,char *filename);
+void findRhymeScheme(structure *s,char *filename,int numLines);
 char *getRhymeId(char *str);
+int structExists(char *filename);
 
 #endif

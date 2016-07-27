@@ -121,24 +121,22 @@ void printCharArr(char **arr){
 }
 
 
-char **strToArr(char *s){ //turns a char* into a char** comprised of every token from input string
+void strToArr(char *s,char **dest){ //turns a char* into a char** comprised of every token from input string
 	
 	char *temp = malloc(sizeof(char)*256);
 	strcpy(temp,s);
 	char *next = malloc(sizeof(char)*256);
-	char **result = (char **) malloc(sizeof(char *)*64);
 	int count = 0;
 
 	next = strtok(temp," ");
 
 	while(next != NULL){
-		result[count] = malloc(sizeof(char)*256);
-		strcpy(result[count],next);
+		dest[count] = malloc(sizeof(char)*256);
+		strcpy(dest[count],next);
 		count++;
 		next = strtok(NULL," ");
 	}
 
-	return result;
 }
 
 int isInFile(char *targ, char *filename){
@@ -204,20 +202,22 @@ int isAlnum(char *str){ //returns true if string is alphanumeric, false otherwis
 	return 1;
 }
 
-int isInCharArr(char **arr,char *str,int size){ // returns 1 if str is found in arr, 0 otherwise
-	
-	for(int i = 0; i<size; i++){
+int isInCharArr(char **arr,char *str){ // returns index of given str if str is found in arr, -1 otherwise
+
+	int i = 0;
+	while(arr[i] != NULL){	
 		if(strcmp(arr[i],str) == 0){
-			return 1;
+			return i;
 		}
+		i++;
 	}
 	
-	return 0;
+	return -1;
 }
 
 char *getWordFromDictEntry(char *str){ //get word data from entry from madlyrics/dict/editedRhymeDict.csv
 
-	char *result = malloc(sizeof(char)*128);
+	char *result = malloc(sizeof(char)*256);
 	char cToStr[2];
 	cToStr[1] = '\0';
 
@@ -234,7 +234,7 @@ char *getWordFromDictEntry(char *str){ //get word data from entry from madlyrics
 
 char *getRhymeIdFromDictEntry(char *str){ //get rhyme ID data from entry from madlyrics/dict/editedRhymeDict.csv
 
-	char *result = malloc(sizeof(char)*128);
+	char *result = malloc(sizeof(char)*256);
 	char cToStr[2];
 	cToStr[1] = '\0';
 
@@ -270,4 +270,90 @@ char *toUpper(char *str){
 	return result;
 }
 
+char *getWordFromTaggedString(char *str){ //removes tag from POS tagged string
+
+
+	char *result = malloc(sizeof(char)*256);
+	char cToStr[2];
+	cToStr[1] = '\0';
+
+	int i = 0;
+
+	while(str[i] != '_'){
+		cToStr[0] = str[i];
+		strcat(result,cToStr);
+		i++;
+	}
+
+	return result;
+}
+
+int isNumber(char *str){
+	int i = 0;
+	while(str[i] != 0){
+		if(isnumber(str[i])){
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
+
+char *arrToStr(char **arr){ //turns a char ** array into a string
+
+	char *str = malloc(sizeof(char)*256);
+
+	int i = 0;
+
+	while(arr[i] != NULL){
+		strcat(str,arr[i]);
+		if(arr[i+1] != NULL){
+			strcat(str," ");
+		}
+		i++;
+	}
+
+	return str;
+}
+
+
+char *getPosFromTaggedString(char *str){ //get rhyme ID data from entry from madlyrics/dict/editedRhymeDict.csv
+
+	char *result = malloc(sizeof(char)*256);
+	char cToStr[2];
+	cToStr[1] = '\0';
+
+	int i = 0;
+	int past = 0; //if 0, current char is not past word data. if 1, it is
+
+	while(str[i] != 0){
+		
+		if(str[i] == '_'){
+			past = 1;
+			i++;
+		}
+
+		if(past && str[i] != '\n'){
+			cToStr[0] = str[i];
+			strcat(result,cToStr);
+		}
+
+		i++;
+	}
+	return result;
+}
+
+
+void removeNewlines(char *s){
+
+	char *i = s;
+	char *j = s;
+	while(*j !=0)
+	{
+		*i = *j++;
+		if(*i != '\n'){
+			i++;}
+	}
+	*i = 0;
+}
 

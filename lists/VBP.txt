@@ -1,12 +1,12 @@
+blow
+hear
+do
+know
 come
 are
-do
 go
 choose
 fall
-blow
-hear
-know
 see
 get
 feel
@@ -14,9 +14,3 @@ think
 meet
 speak
 ai
-pick
-travel
-guess
-want
-belong
-sit

@@ -8,7 +8,8 @@
 int main(int argc,char **argv){ //Takes a .txt file of a song, feeds it into Parsey McParseFace, takes POS-tagged
 				//text and creates a file outlining the song's structure and updates the POS lists
 				//found in madlyrics/lists directory
-
+				//WARNING: Do not run directly unless for testing purposes. Use the genStructs script.
+	
 	structure *s = newStructure();
 
 	int numLines = getNumLines(argv[1]);
@@ -17,11 +18,10 @@ int main(int argc,char **argv){ //Takes a .txt file of a song, feeds it into Par
 
 	parseLines(s,argv[1],numLines);
 	
-	findRhymeScheme(s,argv[1]);
+	findRhymeScheme(s,argv[1],numLines);
 
-	writeStructToFile(s,argv[1],numLines);
-	
 	updatePosLists(s);
+
 
 	return 0; 
 }

@@ -1,5 +1,4 @@
-more
 better
-greener
+more
 worse
 less

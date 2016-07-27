@@ -1,5 +1,4 @@
 and
 nor
 but
-either
 or

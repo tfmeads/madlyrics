@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "structure.h"
 #include "utilities.h"
 #include "lyrics_io.h"
@@ -54,7 +55,7 @@ void parseLines(structure *s, char *filename, int numLines){ //tags untagged lin
 	}
 }
 
-void writeStructToFile(structure *s, char *filename, int numLines){ //writes structure to .txt file in madlyrics/structs/
+void writeStructToFile(structure *s, char *filename, int numLines, char ***words, char ***rhymes){ //writes structure to .txt file in madlyrics/structs/
 
 	char *path = malloc(sizeof(char)*128);
 	strcpy(path,"structs/");
@@ -63,12 +64,44 @@ void writeStructToFile(structure *s, char *filename, int numLines){ //writes str
 
 	FILE *outputFile = fopen(path,"w");
 
-	char *str = malloc(sizeof(char)*128); //holds data for each word that will be printed to outfile
+	char *temp = malloc(sizeof(char)*128);
 
-	for(int i = 0; i<s->lineCount;i++){
-		strcpy(str,getPOS(s->lines[i]->pos)); //writes a line of POS info for each line in file
+	char *str = malloc(sizeof(char)*128); //holds data for each word that will be printed to outfile
+	int i = 0;
+	
+	while(s->lines[i] != NULL){
+
+		char **curr = malloc(sizeof(char *)*64);
+		strToArr(s->lines[i]->pos,curr);
+		strcpy(str,"");
+
+		int j = 0;
+		while(curr[j] != NULL){
+			removeNewlines(curr[j]);
+			
+			if(!ispunct(getPosFromTaggedString(curr[j])[0])){
+
+			sprintf(temp,"%s_%d_%s ",getPosFromTaggedString(curr[j]),
+						isInCharArr(*words,getWordFromTaggedString(curr[j])),
+						(*rhymes)[isInCharArr(*words,getWordFromTaggedString(curr[j]))]
+						); // format: POS_WORDID_RHYMEID
+			strcat(str,temp);
+			}
+			else{
+				strcat(str,(curr[j]));
+				strcat(str," ");
+			}
+			
+			j++;
+		}
+		removeNewlines(str);
+			
 		fprintf(outputFile,"%s\n",str);
-	}
+
+		i++;
+	}	
+
+	
 
 	fprintf(stderr,"Saved structure to structs/%s.\n",filename);
 	fclose(outputFile);
@@ -87,7 +120,7 @@ void updatePosLists(structure *s){ //checks if each word/POS combination is pres
 
 	while(s->lines[i] != NULL){
 		
-		wordsArr = strToArr(removeUnderscores(s->lines[i]->pos)); // evenly sized array with format (word) (pos)
+		strToArr(removeUnderscores(s->lines[i]->pos),wordsArr); // evenly sized array with format (word) (pos)
 		int l = 0;
 		
 		while(wordsArr[l] != NULL){
@@ -116,25 +149,25 @@ void updatePosLists(structure *s){ //checks if each word/POS combination is pres
 	}
 }
 
-void findRhymeScheme(structure *s, char *filename){
+void findRhymeScheme(structure *s, char *filename,int numLines){
 	
-	char **currentLine = malloc(sizeof(char *)*64);
-	char **wordsArr = malloc(sizeof(char *)*128);
+	char **currentLine = malloc(sizeof(char *)*256);
+	char **wordsArr = malloc(sizeof(char *)*256);
 
 	int size = 0;
-	int capacity = 128;
+	int capacity = 256;
 
 	int i = 0;
 
 	while(s-> lines[i] != NULL){
 
-		currentLine = strToArr(removeUnderscores(s->lines[i]->pos));
+		strToArr(removeUnderscores(s->lines[i]->pos),currentLine);
 		
 		int j = 0;
 
 		while(currentLine[j] != NULL){
-			if(!isInCharArr(wordsArr,currentLine[j],size) && !ispunct(currentLine[j][strlen(currentLine[j])-1])){
-				wordsArr[size] = malloc(sizeof(char)*128);
+			if(isInCharArr(wordsArr,currentLine[j]) == -1 && !ispunct(currentLine[j][strlen(currentLine[j])-1])){
+				wordsArr[size] = malloc(sizeof(char)*256);
 				strcpy(wordsArr[size],currentLine[j]);
 				size++;
 			}
@@ -148,17 +181,42 @@ void findRhymeScheme(structure *s, char *filename){
 		i++;
 	}
 	
-
-	char **rhymeArr = malloc(sizeof(char *)* size);
+	
+	char **rhymeArr = malloc(sizeof(char *) * 256);
+	char *curr = malloc(sizeof(char)*256);
 
 	int k = 0;
 
 	while(wordsArr[k] != NULL){
 		rhymeArr[k] = malloc(sizeof(char)*256);
-		strcpy(rhymeArr[k],getRhymeId(wordsArr[k]));
-		fprintf(stderr,"%s %s\n",wordsArr[k],rhymeArr[k]);
+		strcpy(curr,getRhymeId(wordsArr[k]));
+		
+		if(strcmp(curr,"?") == 0 || isInCharArr(rhymeArr,curr) == -1 ){
+			strcpy(rhymeArr[k],curr);
+		}
+		else{
+			sprintf(curr, "%d", isInCharArr(rhymeArr,curr));
+			strcpy(rhymeArr[k],curr);
+		}
+		removeSpaces(wordsArr[k]);	
 		k++;
-	} 
+	}
+	
+	int z = 0;
+	while(rhymeArr[z] != NULL){
+
+		if(!isNumber(rhymeArr[z])){
+			sprintf(rhymeArr[z],"%d",z); //if it's the first occurence of a rhyme, replace rhyme ID with index
+		}
+		removeSpaces(rhymeArr[z]);
+		z++;
+	}
+	
+	
+	writeStructToFile(s,filename,numLines,&wordsArr,&rhymeArr);	
+
+
+	
 }
 	
 
@@ -194,3 +252,32 @@ char *getRhymeId(char *str){ //gets rhyme ID from madlyrics/dicts/editedRhymeDic
 	}
 
 }	
+
+int structExists(char *filename){
+
+	char *temp = malloc(sizeof(char)*128);
+	char *path = malloc(sizeof(char)*128);
+	strcpy(temp,filename);
+	strcpy(path,"structs/");
+	temp+= 8; // removes first 8 characters, which is always 'corpora/'
+	strcat(path,temp);
+	fprintf(stderr,"%s\n",path);	
+	FILE *fp = fopen(path,"r");
+
+	if(fp == NULL){
+		return 0;
+	}
+	else{
+		return 1;
+	}
+
+
+
+//char *getRandomWordFromList(char *list){
+
+//}
+
+
+
+
+}
