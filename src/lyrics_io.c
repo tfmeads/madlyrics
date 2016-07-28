@@ -107,8 +107,8 @@ void writeStructToFile(structure *s, char *filename, int numLines, char ***words
 	fclose(outputFile);
 }
 
-void updatePosLists(structure *s){ //checks if each word/POS combination is present in POS lists found in madlyrics/lists, updates corresponding list
-				   // if not present.
+int updatePosLists(structure *s){ //checks if each word/POS combination is present in POS lists found in madlyrics/lists, updates corresponding list
+				   // if not present. Returns number of new entries added to lists (int).
 
 	char *path = malloc(sizeof(char)*128);
 	char **wordsArr = malloc(sizeof(char *)*64);
@@ -140,13 +140,9 @@ void updatePosLists(structure *s){ //checks if each word/POS combination is pres
 		}
 		i++;
 	}
+	
+	return newEntries;
 
-	if(newEntries > 0){
-		fprintf(stderr,"Updated POS Lists with %i new terms.\n",newEntries);
-	}
-	else{
-		fprintf(stderr,"No new terms were added to POS lists.\n");
-	}
 }
 
 void findRhymeScheme(structure *s, char *filename,int numLines){
@@ -253,31 +249,4 @@ char *getRhymeId(char *str){ //gets rhyme ID from madlyrics/dicts/editedRhymeDic
 
 }	
 
-int structExists(char *filename){
 
-	char *temp = malloc(sizeof(char)*128);
-	char *path = malloc(sizeof(char)*128);
-	strcpy(temp,filename);
-	strcpy(path,"structs/");
-	temp+= 8; // removes first 8 characters, which is always 'corpora/'
-	strcat(path,temp);
-	fprintf(stderr,"%s\n",path);	
-	FILE *fp = fopen(path,"r");
-
-	if(fp == NULL){
-		return 0;
-	}
-	else{
-		return 1;
-	}
-
-
-
-//char *getRandomWordFromList(char *list){
-
-//}
-
-
-
-
-}

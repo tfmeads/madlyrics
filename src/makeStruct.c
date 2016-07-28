@@ -20,8 +20,14 @@ int main(int argc,char **argv){ //Takes a .txt file of a song, feeds it into Par
 	
 	findRhymeScheme(s,argv[1],numLines);
 
-	updatePosLists(s);
-
+	int newEntries = updatePosLists(s);
+	
+	if(newEntries == 0){
+		fprintf(stderr,"No new entries were added to POS lists.\n");
+	}
+	else{
+		fprintf(stderr,"%i new entries were added to POS lists.\n",newEntries);
+	}
 
 	return 0; 
 }
